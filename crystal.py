@@ -8,6 +8,11 @@ import os
 import sys
 import re
 import numpy as np
+import shutil
+
+
+
+ATM_RAD = {'H': 0.25, 'He': 1.2, 'Li': 1.45, 'Be': 1.05, 'B': 0.85, 'C': 0.7, 'N': 0.65, 'O': 0.6, 'F': 0.5, 'Ne': 1.6, 'Na': 1.8, 'Mg': 1.5, 'Al': 1.25, 'Si': 1.1, 'P':1.0, 'S': 1.0, 'Cl': 1.0, 'Ar': 0.71, 'K': 2.2, 'Ca': 1.8, 'Sc': 1.6, 'Ti': 1.4,'V': 1.35, 'Cr': 1.4, 'Mn': 1.4, 'Fe': 1.4, 'Ni': 1.35, 'Cu': 1.35, 'Zn': 1.35,'Ga': 1.3, 'Ge': 1.25, 'As': 1.15, 'Se': 1.15, 'Br': 1.15, 'Kr': '2.02', 'Rb': 2.35, 'Sr': 2.0, 'Y': 1.8, 'Zr': 1.55, 'Nb': 1.45, 'Mo': 1.45, 'Tc': 1.35, 'Ru':1.3, 'Rh': 1.35, 'Pd': 1.4, 'Ag': 1.6, 'Cd': 1.55, 'In': 1.55, 'Sn': 1.45, 'Sb': 1.45, 'Te': 1.4, 'I': 1.4, 'Xe': '1.08', 'Cs': 2.6, 'Ba': 2.15, 'La': 1.95, 'Ce': 1.85, 'Pr': 1.85, 'Nd': 1.85, 'Pm': 1.85, 'Sm': 1.85, 'Eu': 1.85, 'Gd': 1.8,'Tb': 1.75, 'Dy': 1.75, 'Ho': 1.75, 'Er': 1.75, 'Tm': 1.75, 'Yb': 1.75, 'Lu': 1.75, 'Hf': 1.55, 'Ta': 1.45, 'W': 1.35, 'Re': 1.35, 'Os': 1.3, 'Ir': 1.35, 'Pt':1.35, 'Au': 1.35, 'Hg': 1.5, 'Tl': 1.9, 'Pb': 1.8, 'Bi': 1.6, 'Po': 1.9, 'At': None, 'Rn': None, 'Fr': None, 'Ra': 2.15, 'Ac': 1.95, 'Th': 1.8, 'Pa': 1.8, 'U': 1.75, 'Np': 1.75, 'Pu': 1.75, 'Am': 1.75, 'Cm': None, 'Bk': None, 'Cf': None, 'Es': None, 'Fm': None, 'Md': None, 'No': None, 'Lr': None,'Rf': None, 'Db': None, 'Sg': None, 'Bh': None, 'Hs': None, 'Mt': None, 'Ds': None, 'Rg': None, 'Cn': None, 'Nh': None, 'Fl': None, 'Mc':None, 'Lv': None, 'Ts': None, 'Og': None}
 
 def introPopUp():
 
@@ -16,7 +21,7 @@ def introPopUp():
     window.title("Introduction to Setting Up your file")
 
     # Create the message label
-    message = "This will take you through the steps on setting up your file to be viewed on Unity.\n\n Things to note:\n-This system cannot current show more than 16 different atom types\n-This system canot show bonds\n-This system cannot rotate the arrangements\n-This system does not show the unit cell\n-This system cannot increase the range\n\nProgress will continue to try to increase functionality, but is dependnet upon the designers to do so."
+    message = "This will take you through the steps on setting up your file to be viewed on Unity.\n\n Things to note:\n-This system cannot currently show more than 16 different atom types\n-This system canot show bonds\n-This system does not show the unit cell\n-This system cannot increase the range\n\nProgress will continue to try to increase functionality, but is dependent upon the designers to do so.\n\nIf you would like to skip to opening your file, click 'Skip'. If you would like to learn how to create your file in CrystalMaker to be parsed, click 'OK'"
     label = tk.Label(window, text=message)
     label.pack(padx=20, pady=20)
     def on_ok():
@@ -152,7 +157,6 @@ def conversion(file_path):
             print("BBB", value)
             popup_window.destroy()
 
-
         value = None
         # Create the popup window
         popup_window = tk.Tk()
@@ -176,7 +180,7 @@ def conversion(file_path):
     def successful_popup(file_loc):
         window = tk.Tk()
         window.title("Success!")
-        message = "Your file conversion was a success! Click OK to move onto the next step\n\nYour file is located at " + file_loc
+        message = "Your file conversion was a success! Your TXT file was moved to 'Documents > TXT Files' folder. Click OK to move onto the next step\n\nYour JSON file is located at " + file_loc
         # Create the message label in the popup window
         label = tk.Label(window, text=message)
         label.pack(padx=20, pady=20)
@@ -196,7 +200,7 @@ def conversion(file_path):
         ok_button = tk.Button(window, text="OK", width=10, command=on_ok)
         ok_button.pack(padx=10, pady=10, side = tk.LEFT)
 
-        ch_button = tk.Button(window, text="Choose Another", width=10, command=on_ch)
+        ch_button = tk.Button(window, text="Choose Another", width=15, command=on_ch)
         ch_button.pack(padx=10, pady=10, side = tk.RIGHT)
 
         ex_button = tk.Button(window, text="Exit", width=10, command=on_exit)
@@ -204,8 +208,6 @@ def conversion(file_path):
 
         # Run the main event loop for the popup window
         window.mainloop()
-
-
 
     def unsuccessful_popup(error):
         popup_window = tk.Tk()
@@ -225,7 +227,7 @@ def conversion(file_path):
         json_str = json.dumps(dict)
         print(json_str)
         # Save JSON string to a fileC:
-        new_file_path = "C:/Users/jared/HololensXR/Assets/" + file_name.replace(" ", "").replace(".txt", "")+".json"
+        new_file_path = "C:\\Users\\MSE-HOLOLENS-COMP\\Documents\\JSON Files\\" + file_name.replace(" ", "").replace(".txt", "")+".json"
         with open(new_file_path, "w") as file:
             file.write(json_str)
         print(new_file_path)
@@ -287,6 +289,19 @@ def conversion(file_path):
         # Convert the updated JSON back to string
         return dict
 
+    def move_file(source_path, destination_path):
+        try:
+            # Move the file from the source path to the destination path
+            shutil.move(source_path, destination_path)
+            print(f"TXT File moved successfully")
+        except FileNotFoundError:
+            print(f"Source file '{source_path}' not found.")
+        except PermissionError:
+            print(f"Permission error occurred while moving the file.")
+        except shutil.Error as e:
+            print(f"An error occurred while moving the file: {e}")
+
+
     tkinter_stuff()
     colors = ["red", "green", "blue", "orange" ,"cyan", "magenta", "yellow", "purple",  "brown", "teal", "silver", "gold", "lime", "grey", "white", "black"]
     print(file_path)
@@ -310,21 +325,25 @@ def conversion(file_path):
             atomic_radius = None
             color = None
             try:
-                atomic_radius = element(info[0]).atomic_radius * 0.01
+                atomic_radius = ATM_RAD[info[0]]
+                if atomic_radius == None:
+                    raise "AAAA"
             except:
                 if all_dict["atoms"] != []:
                     for atom in all_dict["atoms"]:
                         if atom["symbol"] == info[0]:
                             atomic_radius = atom["atomic_radius"]
                             break
+
+            if atomic_radius == None:
+                atomic_radius = open_text_popup("What is the radius (in Angstroms) of " + info[0] + "? ")
+                atomic_radius = float(atomic_radius)
+
             if color == None and all_dict["atoms"] != []:
                 for atom in all_dict["atoms"]:
                     if atom["symbol"] == info[0]:
                         color = atom["color"]
                         break
-            if atomic_radius == None:
-                atomic_radius = open_text_popup("What is the radius (in Angstroms) of " + info[0] + "? ")
-                atomic_radius = float(atomic_radius)
             if color == None:
                 color = colors[0]
                 colors = colors[1:]
@@ -333,18 +352,18 @@ def conversion(file_path):
             all_dict["atoms"].append({"symbol":info[0], "atomic_radius":atomic_radius, "color":color, "xor":float(info[-3]),"yor":float(info[-2]),"zor":float(info[-1])})
         all_dict = center_origin(all_dict)
         file_loc = dict_to_json_file(all_dict, file_path)
+        move_file(file_path, r"C:\\Users\\MSE-HOLOLENS-COMP\\Documents\\Text Files\\"+os.path.basename(file_path))
         successful_popup(file_loc)
     except Exception as e:
         unsuccessful_popup(str(e))
-
 
 def unityPopUp():
     def on_ok():
         window.destroy()
         sys.exit()
     window = tk.Tk()
-    window.title("Unity Information")
-    message = f"-Open Unity and the File Called \"AR Crystal Viewer\". The file should open within 1-2 minutes.\n\n-Click on the AR Session Origin and look in the bottom-right corner to see the \'Atom Arrangements (Script)\' component (you may need to scroll down on the \"Inspector\" panel).\nYou should also see your molecule's JSON file in the \'Assets\' Folder on the bottom of the \"Project\'s\" Window.\n\n-Drag that file into the \'File Name' Box. Then click the play button to see your atoms. Atoms will be better visible by clicking the \'Scene\' button near the play.\n\n-Click the play button again to exit out of the simulation.\n\nBy clicking the button, you officially finish the tutorial on uploading your file to Unity."
+    window.title("Hololens Files + Holocrystal Information")
+    message = f"-Plug in Hololens to computer and turn the Hololens on. \n-Drag the JSON file into Hololens's Documents folder\n-Run HoloCrystal on Hololens\n-Choose your desired Crystal in HoloCrystal\n\nThat's it! Enjoy visualizing your crystal :)"
     label = tk.Label(window, text=message)
     label.pack(padx=20, pady=20)
     ok_button = tk.Button(window, text="OK", width=10, command=on_ok)
